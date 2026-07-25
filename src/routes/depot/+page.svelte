@@ -114,10 +114,19 @@
       touched["structure.st_type"] && !structure.st_type.trim()
         ? "Champ obligatoire"
         : "",
-    modelFiles:
-      touched["modelFiles"] && modelFiles.length === 0
-        ? "Au moins un modèle 3D requis"
-        : invalidFileMessage(modelFiles),
+    "structure.model_author":
+      touched["structure.model_author"] && !structure.model_author.trim()
+        ? "Champ obligatoire"
+        : "",
+    "structure.depositor":
+      touched["structure.depositor"] && !structure.depositor.trim()
+        ? "Champ obligatoire"
+        : "",
+    "structure.software":
+      touched["structure.software"] && !structure.software.trim()
+        ? "Champ obligatoire"
+        : "",
+    modelFiles: invalidFileMessage(modelFiles),
     orthoFiles: invalidFileMessage(orthoFiles),
     photoFiles: invalidFileMessage(photoFiles),
     workFiles: invalidFileMessage(workFiles),
@@ -141,9 +150,12 @@
   let step2Valid = $derived(
     !!structure.id.trim() &&
     !!structure.st_type.trim() &&
+    !!structure.model_author.trim() &&
+    !!structure.depositor.trim() &&
+    !!structure.software.trim() &&
     isSafeSegment(structure.id)
   );
-  let step3Valid = $derived(modelFiles.length > 0 && filesValid);
+  let step3Valid = $derived(filesValid);
   let allValid = $derived(step1Valid && step2Valid && step3Valid);
 
   function goToStep(step: number) {
@@ -173,6 +185,9 @@
     if (currentStep === 2) {
       touch("structure.id");
       touch("structure.st_type");
+      touch("structure.model_author");
+      touch("structure.depositor");
+      touch("structure.software");
     }
     if (currentStep === 3) {
       touch("modelFiles");
@@ -237,10 +252,21 @@
   let duplicateWarning = $state("");
   let dropError = $state("");
 
+  let modelWarning = $derived.by(() => {
+    if (modelFiles.length === 0) return "";
+    const exts = modelFiles.map(extensionOf);
+    const hasObjOrPly = exts.includes("obj") || exts.includes("ply");
+    const hasTextures = exts.includes("mtl") || exts.includes("png") || exts.includes("jpg") || exts.includes("jpeg");
+    if (hasObjOrPly && !hasTextures) {
+        return "Attention : Vous avez importé un fichier PLY ou OBJ. S'il possède des textures, n'oubliez pas d'importer également les fichiers associés (.mtl, .png, .jpg).";
+    }
+    return "";
+  });
+
   const DROP_LABELS: Record<"model" | "ortho" | "photo" | "work", string> = {
     model: "Modèles 3D",
-    ortho: "Orthomosaïques",
-    photo: "Photos",
+    ortho: "Dérivés 2D",
+    photo: "Photos source",
     work: "Fichiers de travail",
   };
 
@@ -248,8 +274,8 @@
     "model" | "ortho" | "photo" | "work",
     string[]
   > = {
-    model: ["glb", "gltf", "obj"],
-    ortho: ["tif", "tiff", "png", "jpg", "jpeg"],
+    model: ["glb", "ply", "obj", "stl", "mtl", "png", "jpg", "jpeg"],
+    ortho: ["tif", "tiff", "png", "jpg", "jpeg", "webp", "bmp"],
     photo: [
       "jpg",
       "jpeg",
@@ -314,28 +340,20 @@
   }
 
   async function pickModelFiles() {
-    const files = await pickFiles("Sélectionner les modèles 3D", [
-      { name: "Modèles 3D", extensions: ["glb", "gltf", "obj"] },
-    ], false);
+    const files = await pickFiles("Sélectionner les modèles 3D et textures", [
+      { name: "Fichiers 3D", extensions: ["glb", "ply", "obj", "stl", "mtl", "png", "jpg", "jpeg"] },
+    ], true);
     if (files.length > 0) {
-      if (modelFiles.length > 0) {
-        dropError = "Un seul modèle 3D est autorisé. Supprimez le modèle actuel avant d'en ajouter un autre.";
-        setTimeout(() => {
-          dropError = "";
-        }, 5000);
-        return;
-      }
-      const firstModel = files[0];
-      const { merged, dupes } = addFilesWithDedup(modelFiles, [firstModel]);
-      modelFiles = merged.slice(0, 1);
+      const { merged, dupes } = addFilesWithDedup(modelFiles, files);
+      modelFiles = merged;
       showDupeWarning(dupes);
       await countPolygons();
     }
   }
 
   async function pickOrthoFiles() {
-    const files = await pickFiles("Sélectionner les orthomosaïques", [
-      { name: "Images", extensions: ["tif", "tiff", "png", "jpg", "jpeg"] },
+    const files = await pickFiles("Sélectionner les dérivés 2D", [
+      { name: "Images", extensions: ["tif", "tiff", "png", "jpg", "jpeg", "webp", "bmp"] },
     ]);
     if (files.length > 0) {
       const { merged, dupes } = addFilesWithDedup(orthoFiles, files);
@@ -345,9 +363,9 @@
   }
 
   async function pickPhotoFiles() {
-    const files = await pickFiles("Sélectionner les photos", [
+    const files = await pickFiles("Sélectionner les photos source", [
       {
-        name: "Photos",
+        name: "Photos source",
         extensions: [
           "jpg",
           "jpeg",
@@ -480,20 +498,7 @@
     }
 
     if (zone === "model") {
-      if (modelFiles.length > 0) {
-        dropError = "Un seul modèle 3D est autorisé. Supprimez le modèle actuel avant d'en ajouter un autre.";
-        setTimeout(() => {
-          dropError = "";
-        }, 5000);
-        return;
-      }
-      if (validPaths.length > 1) {
-        dropError = "Un seul modèle 3D est autorisé. Seul le premier fichier a été conservé.";
-        setTimeout(() => {
-          dropError = "";
-        }, 5000);
-      }
-      const { merged, dupes } = addFilesWithDedup(modelFiles, [validPaths[0]]);
+      const { merged, dupes } = addFilesWithDedup(modelFiles, validPaths);
       modelFiles = merged;
       showDupeWarning(dupes);
       await countPolygons();
@@ -717,7 +722,7 @@
             <!-- Modèles 3D -->
             <FileDropZone
               title="Modèles 3D"
-              required={true}
+              required={false}
               files={modelFiles}
               dropId="model"
               {dragOver}
@@ -725,10 +730,15 @@
               on:add={addModelFiles}
               on:remove={(e) => removeFile("model", e.detail)}
             />
+            {#if modelWarning}
+              <div class="status-message warning" style="margin-top: -var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                {modelWarning}
+              </div>
+            {/if}
 
-            <!-- Orthomosaïques -->
+            <!-- Dérivés 2D -->
             <FileDropZone
-              title="Orthophotographies"
+              title="Dérivés 2D"
               files={orthoFiles}
               dropId="ortho"
               {dragOver}
@@ -737,9 +747,9 @@
               on:remove={(e) => removeFile("ortho", e.detail)}
             />
 
-            <!-- Photos -->
+            <!-- Photos source -->
             <FileDropZone
-              title="Photos"
+              title="Photos source"
               files={photoFiles}
               dropId="photo"
               {dragOver}

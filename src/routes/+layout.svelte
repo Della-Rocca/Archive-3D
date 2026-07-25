@@ -514,7 +514,7 @@
     top: calc(100% + 4px);
     left: 0;
     right: 0;
-    max-height: 220px;
+    max-height: 156px;
     overflow-y: auto;
     background: var(--color-neutral-100);
     border: var(--border-width) solid var(--color-neutral-400);

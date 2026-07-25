@@ -3,9 +3,9 @@
 
   let {
     title = "",
-    operationCode = "—",
-    operationSite = "—",
-    structureType = "—",
+    operationCode = "-",
+    operationSite = "-",
+    structureType = "-",
     hasModel = false,
     hasPhotos = false,
     hasOrtho = false,
@@ -54,7 +54,7 @@
   <div class="card-footer">
     <span class="file-pill" class:present={hasModel}>Modèle 3D</span>
     <span class="file-pill" class:present={hasPhotos}>Photos</span>
-    <span class="file-pill" class:present={hasOrtho}>Ortho</span>
+    <span class="file-pill" class:present={hasOrtho}>Dérivés 2D</span>
     <span class="file-pill" class:present={hasWork}>Travail</span>
   </div>
 </button>

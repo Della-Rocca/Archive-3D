@@ -7,7 +7,7 @@
   let {
     operationItems = [],
     structureItems = [],
-    description = "—",
+    description = "-",
   }: {
     operationItems?: MetadataDisplayItem[];
     structureItems?: MetadataDisplayItem[];
@@ -15,7 +15,7 @@
   } = $props();
 
   function isMissing(value: string): boolean {
-    return value.trim() === "—";
+    return value.trim() === "-";
   }
 
   function isTechnical(label: string, value: string): boolean {

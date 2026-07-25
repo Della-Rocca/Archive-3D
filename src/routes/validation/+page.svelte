@@ -775,13 +775,13 @@
                   <div class="meta-minimal-line">
                     <span class="meta-minimal-label">Type d'opération</span>
                     <span class="meta-minimal-value"
-                      >{metadata.operation.op_type || "—"}</span
+                      >{metadata.operation.op_type || "-"}</span
                     >
                   </div>
                   <div class="meta-minimal-line">
                     <span class="meta-minimal-label">Responsable</span>
                     <span class="meta-minimal-value"
-                      >{metadata.operation.responsable || "—"}</span
+                      >{metadata.operation.responsable || "-"}</span
                     >
                   </div>
                 </div>
@@ -801,37 +801,37 @@
                   <div class="meta-minimal-line">
                     <span class="meta-minimal-label">Auteur du modèle</span>
                     <span class="meta-minimal-value"
-                      >{metadata.structure.model_author || "—"}</span
+                      >{metadata.structure.model_author || "-"}</span
                     >
                   </div>
                   <div class="meta-minimal-line">
                     <span class="meta-minimal-label">Déposant</span>
                     <span class="meta-minimal-value"
-                      >{metadata.structure.depositor || "—"}</span
+                      >{metadata.structure.depositor || "-"}</span
                     >
                   </div>
                   <div class="meta-minimal-line">
                     <span class="meta-minimal-label">Logiciels</span>
                     <span class="meta-minimal-value"
-                      >{metadata.structure.software || "—"}</span
+                      >{metadata.structure.software || "-"}</span
                     >
                   </div>
                   <div class="meta-minimal-line">
                     <span class="meta-minimal-label">Nombre de photos</span>
                     <span class="meta-minimal-value"
-                      >{metadata.structure.photos_count || "—"}</span
+                      >{metadata.structure.photos_count || "-"}</span
                     >
                   </div>
                   <div class="meta-minimal-line">
                     <span class="meta-minimal-label">Nombre de polygones</span>
                     <span class="meta-minimal-value"
-                      >{metadata.structure.faces_count || "—"}</span
+                      >{metadata.structure.faces_count || "-"}</span
                     >
                   </div>
                   <div class="meta-minimal-line meta-minimal-line-full">
                     <span class="meta-minimal-label">Description</span>
                     <span class="meta-minimal-value"
-                      >{metadata.structure.description || "—"}</span
+                      >{metadata.structure.description || "-"}</span
                     >
                   </div>
                 </div>
@@ -846,7 +846,7 @@
                     >3D {compact.models}</span
                   >
                   <span class="compact-pill" class:present={compact.orthos > 0}
-                    >Ortho {compact.orthos}</span
+                    >Dérivés 2D {compact.orthos}</span
                   >
                   <span class="compact-pill" class:present={compact.photos > 0}
                     >Photos {compact.photos}</span
@@ -957,8 +957,8 @@
             <div class="confirm-meta">
               <span><strong>Structure:</strong> {metadata.structure.id}</span>
               <span><strong>Opération:</strong> {metadata.operation.code}</span>
-              <span><strong>Site:</strong> {metadata.operation.site || "—"}</span>
-              <span><strong>Type:</strong> {metadata.structure.st_type || "—"}</span>
+              <span><strong>Site:</strong> {metadata.operation.site || "-"}</span>
+              <span><strong>Type:</strong> {metadata.structure.st_type || "-"}</span>
             </div>
           {/if}
           <div class="preview-compact">
@@ -967,10 +967,10 @@
                 >3D {compact.models}</span
               >
               <span class="compact-pill" class:present={compact.orthos > 0}
-                >Ortho {compact.orthos}</span
+                >Dérivés 2D {compact.orthos}</span
               >
               <span class="compact-pill" class:present={compact.photos > 0}
-                >Photos {compact.photos}</span
+                >Photos source {compact.photos}</span
               >
               <span class="compact-pill" class:present={compact.work > 0}
                 >Travail {compact.work}</span
@@ -1047,9 +1047,8 @@
               operationCode={listDetails[item.path]?.metadata?.operation.code ||
                 item.operation_folder}
               operationSite={listDetails[item.path]?.metadata?.operation.site ||
-                "—"}
-              structureType={listDetails[item.path]?.metadata?.structure
-                .st_type || "—"}
+                "-"}
+              structureType={listDetails[item.path]?.metadata?.structure.st_type || "-"}
               hasModel={(listDetails[item.path]?.models?.length || 0) > 0}
               hasPhotos={(listDetails[item.path]?.photos?.length || 0) > 0}
               hasOrtho={(listDetails[item.path]?.orthos?.length || 0) > 0}
@@ -1103,7 +1102,7 @@
                       </span>
                     </td>
                     <td class="cell-bold">{structureName(entry.structure_path)}</td>
-                    <td>{entry.user || "—"}</td>
+                    <td>{entry.user || "-"}</td>
                     <td class="cell-date">{formatTimestamp(entry.timestamp)}</td>
                   </tr>
                 {/each}

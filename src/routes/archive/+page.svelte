@@ -17,7 +17,7 @@
     path: string;
     has_model: boolean;
     has_orthos: boolean;
-    has_production: boolean;
+    has_photos: boolean;
     last_modified_unix: number | null;
   }
 
@@ -87,7 +87,7 @@
   }
 
   type ArchiveTab = "consultation" | "stats" | "inventory";
-  type ConsultationAssetFilter = "all" | "3d" | "ortho" | "prod";
+  type ConsultationAssetFilter = "all" | "3d" | "ortho" | "photos";
   type InventorySortField =
     | "structure_id"
     | "operation_code"
@@ -262,7 +262,7 @@
       assetFilterParam === "all" ||
       assetFilterParam === "3d" ||
       assetFilterParam === "ortho" ||
-      assetFilterParam === "prod"
+      assetFilterParam === "photos"
     ) {
       filterAsset = assetFilterParam;
     }
@@ -346,7 +346,7 @@
       if (filterStructureType.trim()) filters.structure_type = filterStructureType.trim();
       if (filterAsset === "3d") filters.has_model = true;
       if (filterAsset === "ortho") filters.has_orthos = true;
-      if (filterAsset === "prod") filters.has_production = true;
+      if (filterAsset === "photos") filters.has_photos = true;
 
       let effectiveSortField = sortField;
       let effectiveSortDirection = sortDirection;
@@ -526,12 +526,12 @@
         }
       }
 
-      throw lastError ?? new Error("Aucune orthophoto exploitable.");
+      throw lastError ?? new Error("Aucun dérivé 2D exploitable.");
     } catch (error) {
       if (token !== detailRequestToken) return;
       orthoPreviewError = stringifyError(
         error,
-        "Impossible de charger la prévisualisation orthophoto.",
+        "Impossible de charger la prévisualisation 2D.",
       );
     } finally {
       if (token !== detailRequestToken) return;
@@ -562,7 +562,7 @@
       if (details.orthos.length > 0) {
         await loadOrthoPreview(details.orthos, token);
       } else {
-        orthoPreviewError = "Aucune orthophoto disponible sur cette structure.";
+        orthoPreviewError = "Aucun dérivé 2D disponible sur cette structure.";
       }
     } catch (error) {
       if (token !== detailRequestToken) return;
@@ -593,10 +593,10 @@
   }
 
   function valueToText(value: unknown): string {
-    if (value === null || value === undefined) return "—";
-    if (typeof value === "string") return value.trim() || "—";
+    if (value === null || value === undefined) return "-";
+    if (typeof value === "string") return value.trim() || "-";
     if (typeof value === "number" || typeof value === "boolean") return String(value);
-    if (Array.isArray(value)) return value.length ? value.map((item) => valueToText(item)).join(", ") : "—";
+    if (Array.isArray(value)) return value.length ? value.map((item) => valueToText(item)).join(", ") : "-";
     if (typeof value === "object") return JSON.stringify(value);
     return String(value);
   }
@@ -1152,6 +1152,33 @@
         </div>
 
         <div class="consultation-toolbar">
+          <div class="filter-segments">
+            <button
+              class="btn-segment {filterAsset === 'all' ? 'active' : ''}"
+              on:click={() => { filterAsset = "all"; loadArchive(); }}
+            >
+              Tout
+            </button>
+            <button
+              class="btn-segment {filterAsset === '3d' ? 'active' : ''}"
+              on:click={() => { filterAsset = "3d"; loadArchive(); }}
+            >
+              3D
+            </button>
+            <button
+              class="btn-segment {filterAsset === 'ortho' ? 'active' : ''}"
+              on:click={() => { filterAsset = "ortho"; loadArchive(); }}
+            >
+              Dérivés 2D
+            </button>
+            <button
+              class="btn-segment {filterAsset === 'photos' ? 'active' : ''}"
+              on:click={() => { filterAsset = "photos"; loadArchive(); }}
+            >
+              Photos
+            </button>
+          </div>
+
           {#if query || filterAsset !== "all" || filterOperationCode || filterStructureType || filterDateOrder}
             <button class="btn-link" on:click={resetFilters}>Réinitialiser</button>
           {/if}
@@ -1257,8 +1284,8 @@
                   </div>
                   <div class="cell-badges">
                     {#if item.has_model}<span class="asset-badge asset-3d">3D</span>{/if}
-                    {#if item.has_orthos}<span class="asset-badge asset-ortho">Ortho</span>{/if}
-                    {#if item.has_production}<span class="asset-badge asset-prod">Prod</span>{/if}
+                    {#if item.has_orthos}<span class="asset-badge asset-ortho">Dérivés 2D</span>{/if}
+                    {#if item.has_photos}<span class="asset-badge asset-photos">Photos</span>{/if}
                   </div>
                 </button>
               {/each}
@@ -1340,7 +1367,7 @@
                 <div class="detail-assets-summary" aria-label="Informations assets">
                   <div class="cell-badges">
                     <span class="asset-badge asset-3d">3D</span>
-                    <span class="asset-badge asset-ortho">Ortho</span>
+                    <span class="asset-badge asset-ortho">Dérivés 2D</span>
                   </div>
                 </div>
               </div>
@@ -1406,7 +1433,7 @@
             {:else if selectedDetails}
               <div class="detail-viewers-grid" class:detail-viewers-grid-empty={detailNoVisualAssets}>
                 <div class="detail-section detail-viewer-card" class:detail-viewer-card-compact={detailNoVisualAssets}>
-                  <h3>Orthophotos</h3>
+                  <h3>Dérivés 2D</h3>
                   {#if detailNoVisualAssets}
                     <p class="detail-muted">Aucun fichier 3D ni image disponible.</p>
                   {:else if orthoPreviewLoading}
@@ -1418,7 +1445,7 @@
                           type="button"
                           class="ortho-viewer-icon-btn"
                           on:click={() => (showOrthoPreviewModal = true)}
-                          aria-label="Agrandir l'orthophoto"
+                          aria-label="Agrandir l'image"
                           title="Agrandir"
                         >
                           <svg viewBox="0 0 24 24" fill="none" width="14" height="14" aria-hidden="true">
@@ -1432,9 +1459,9 @@
                           type="button"
                           class="ortho-preview-thumb"
                           on:click={() => (showOrthoPreviewModal = true)}
-                          aria-label="Agrandir l'orthophoto"
+                          aria-label="Agrandir l'image"
                         >
-                          <img src={orthoPreviewSrc} alt={`Aperçu orthophoto ${selectedItem.structure_id}`} />
+                          <img src={orthoPreviewSrc} alt={`Aperçu 2D ${selectedItem.structure_id}`} />
                         </button>
                       </div>
                       <div class="ortho-preview-caption">
@@ -1442,7 +1469,7 @@
                       </div>
                     </div>
                   {:else}
-                    <p class="detail-muted">{orthoPreviewError || "Aucune orthophoto exploitable."}</p>
+                    <p class="detail-muted">{orthoPreviewError || "Aucun dérivé 2D exploitable."}</p>
                   {/if}
                 </div>
 
@@ -1486,7 +1513,7 @@
           class="ortho-modal-backdrop"
           role="dialog"
           aria-modal="true"
-          aria-label="Prévisualisation orthophoto"
+          aria-label="Prévisualisation 2D"
           tabindex="0"
           on:click={() => (showOrthoPreviewModal = false)}
           on:keydown={(event) => event.key === "Escape" && (showOrthoPreviewModal = false)}
@@ -1495,13 +1522,13 @@
             type="button"
             class="ortho-modal-close"
             on:click|stopPropagation={() => (showOrthoPreviewModal = false)}
-            aria-label="Fermer l'aperçu orthophoto"
+            aria-label="Fermer l'aperçu 2D"
           >
             ×
           </button>
           <img
             src={orthoPreviewSrc}
-            alt={`Orthophoto ${selectedItem?.structure_id ?? ""}`}
+            alt={`Dérivé 2D ${selectedItem?.structure_id ?? ""}`}
           />
         </div>
       {/if}
@@ -2079,22 +2106,22 @@
                 <tr class:row-alt={i % 2 === 1}>
                   <td class="cell-bold">{item.structure_id}</td>
                   <td class="cell-code">{item.operation_code}</td>
-                  <td>{item.operation_site || "—"}</td>
-                  <td>{item.operation_type || "—"}</td>
-                  <td>{item.operation_responsable || "—"}</td>
+                  <td>{item.operation_site || "-"}</td>
+                  <td>{item.operation_type || "-"}</td>
+                  <td>{item.operation_responsable || "-"}</td>
                   <td>{item.structure_type}</td>
-                  <td>{item.photos_count || "—"}</td>
-                  <td>{item.photos_total_size_mb || "—"}</td>
-                  <td>{item.model_size_mb || "—"}</td>
-                  <td
+                  <td>{item.photos_count || "-"}</td>
+                  <td>{item.photos_total_size_mb || "-"}</td>
+                  <td>{item.model_size_mb || "-"}</td>
+                  <td class="cell-number"
                     >{item.faces_count
                       ? parseInt(item.faces_count).toLocaleString("fr-FR")
-                      : "—"}</td
+                      : "-"}</td
                   >
-                  <td>{item.model_author || "—"}</td>
-                  <td>{item.depositor || "—"}</td>
-                  <td>{item.software || "—"}</td>
-                  <td class="cell-date">{item.deposit_date || "—"}</td>
+                  <td>{item.model_author || "-"}</td>
+                  <td>{item.depositor || "-"}</td>
+                  <td>{item.software || "-"}</td>
+                  <td class="cell-date">{item.deposit_date || "-"}</td>
                 </tr>
               {/each}
             </tbody>
@@ -3179,7 +3206,7 @@
     color: var(--color-info);
   }
 
-  .asset-prod {
+  .asset-photos {
     background: var(--color-warning-bg);
     color: var(--color-warning);
   }

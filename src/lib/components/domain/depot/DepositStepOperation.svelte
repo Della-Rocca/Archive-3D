@@ -2,6 +2,7 @@
     import { createEventDispatcher } from "svelte";
     import type { OperationMeta, Presets } from "$lib/types/deposit";
     import { getSafeSegmentError, isSafeSegment } from "$lib/utils/path";
+    import ComboInput from "$lib/components/ComboInput.svelte";
 
     let {
         operation = $bindable<OperationMeta>({ code: "", site: "", op_type: "", responsable: "" }),
@@ -260,35 +261,21 @@
                                 </div>
                                 <div class="quick-field">
                                     <label class="quick-label" for="qc-type">Type d'opération</label>
-                                    <input
-                                        id="qc-type"
-                                        class="quick-input"
+                                    <ComboInput
                                         bind:value={quickForm.op_type}
-                                        list="qc-type-list"
+                                        options={presets.operation_types}
                                         placeholder="ex: Fouille préventive"
                                         disabled={quickSaving}
                                     />
-                                    <datalist id="qc-type-list">
-                                        {#each presets.operation_types as t}
-                                            <option value={t}></option>
-                                        {/each}
-                                    </datalist>
                                 </div>
                                 <div class="quick-field">
                                     <label class="quick-label" for="qc-responsable">Responsable</label>
-                                    <input
-                                        id="qc-responsable"
-                                        class="quick-input"
+                                    <ComboInput
                                         bind:value={quickForm.responsable}
-                                        list="qc-resp-list"
+                                        options={presets.responsables}
                                         placeholder="ex: Dupont Marie"
                                         disabled={quickSaving}
                                     />
-                                    <datalist id="qc-resp-list">
-                                        {#each presets.responsables as r}
-                                            <option value={r}></option>
-                                        {/each}
-                                    </datalist>
                                 </div>
                             </div>
 
@@ -334,13 +321,15 @@
         background: #fff;
         border: 1px solid var(--color-neutral-300);
         border-radius: var(--border-radius-lg);
-        overflow: hidden;
+        overflow: visible;
         margin-bottom: var(--spacing-xl);
     }
     .section-header {
         background: var(--color-neutral-100);
         padding: var(--spacing-md) var(--spacing-lg);
         border-bottom: 1px solid var(--color-neutral-300);
+        border-top-left-radius: var(--border-radius-lg);
+        border-top-right-radius: var(--border-radius-lg);
     }
     .section-header h2 {
         margin: 0;

@@ -98,10 +98,10 @@ pub fn calculate_archive_statistics(config: &AppConfig) -> Result<ArchiveStatist
 
             // Calculer les tailles de dossiers
             stats.total_size_bytes += calculate_directory_size_bytes(&st_path);
-            let models_dir = st_path.join("Modeles");
+            let models_dir = st_path.join("modeles");
             stats.total_models_size_bytes += calculate_directory_size_bytes(&models_dir);
-            let orthos_dir = st_path.join("Orthomosaique");
-            let photos_dir = st_path.join("DossierProduction").join("Photos");
+            let orthos_dir = st_path.join("derivees_2D");
+            let photos_dir = st_path.join("donnees_sources").join("Photos");
             stats.total_photos_size_bytes +=
                 calculate_directory_size_bytes(&orthos_dir) + calculate_directory_size_bytes(&photos_dir);
 

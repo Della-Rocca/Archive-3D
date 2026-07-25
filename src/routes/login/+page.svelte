@@ -14,7 +14,6 @@
 
   interface AppConfig {
     depot_path: string;
-    validation_path: string;
     archive_path: string;
     settings_path: string;
   }
@@ -36,7 +35,7 @@
         // Vérification si premier lancement (chemins manquants)
         try {
           const config = await invoke<AppConfig>("get_app_config");
-          const needsSetup = !config.depot_path || !config.validation_path || !config.archive_path || !config.settings_path;
+          const needsSetup = !config.depot_path || !config.archive_path || !config.settings_path;
           if (needsSetup) {
             goto("/setup");
           } else {

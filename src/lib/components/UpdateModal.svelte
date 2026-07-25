@@ -76,7 +76,7 @@
       <div class="update-header">
         <h2 id="update-title">Nouvelle version disponible</h2>
         <p class="update-subtitle">
-          Version {update.version} — vous utilisez actuellement la version {update.currentVersion}
+          Version {update.version} - vous utilisez actuellement la version {update.currentVersion}
         </p>
       </div>
       <div class="update-body">

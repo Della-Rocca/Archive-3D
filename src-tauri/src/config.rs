@@ -8,7 +8,6 @@ use tauri_plugin_store::StoreExt;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
     pub depot_path: String,
-    pub validation_path: String,
     pub archive_path: String,
     /// Dossier Paramètres : contient metadata-presets.json, audit.log, revision-tags.json
     pub settings_path: String,
@@ -19,7 +18,6 @@ impl Default for AppConfig {
     fn default() -> Self {
         Self {
             depot_path: "".to_string(),
-            validation_path: "".to_string(),
             archive_path: "".to_string(),
             settings_path: "".to_string(),
             admin_password: "1".to_string(),
@@ -55,11 +53,6 @@ impl AppConfig {
             .and_then(|v| v.as_str().map(|s| s.to_string()))
             .unwrap_or_default();
 
-        let validation_path = store
-            .get("validation_path")
-            .and_then(|v| v.as_str().map(|s| s.to_string()))
-            .unwrap_or_default();
-
         let archive_path = store
             .get("archive_path")
             .and_then(|v| v.as_str().map(|s| s.to_string()))
@@ -80,11 +73,6 @@ impl AppConfig {
                 defaults.depot_path
             } else {
                 depot_path
-            },
-            validation_path: if validation_path.trim().is_empty() {
-                defaults.validation_path
-            } else {
-                validation_path
             },
             archive_path: if archive_path.trim().is_empty() {
                 defaults.archive_path
@@ -111,7 +99,6 @@ impl AppConfig {
             .map_err(|e| format!("Erreur chargement store: {}", e))?;
 
         store.set("depot_path", serde_json::json!(&self.depot_path));
-        store.set("validation_path", serde_json::json!(&self.validation_path));
         store.set("archive_path", serde_json::json!(&self.archive_path));
         store.set("settings_path", serde_json::json!(&self.settings_path));
         store.set("admin_password", serde_json::json!(&self.admin_password));
@@ -140,18 +127,6 @@ impl AppConfig {
             result
                 .errors
                 .push(format!("Dépôt introuvable: {}", self.depot_path));
-            result.valid = false;
-        }
-
-        // Vérifier validation_path
-        if self.validation_path.is_empty() {
-            result
-                .warnings
-                .push("Chemin Validation non configuré".to_string());
-        } else if !PathBuf::from(&self.validation_path).exists() {
-            result
-                .errors
-                .push(format!("Validation introuvable: {}", self.validation_path));
             result.valid = false;
         }
 

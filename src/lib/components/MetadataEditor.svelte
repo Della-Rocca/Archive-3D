@@ -525,7 +525,7 @@
                 <div class="op-info">
                   <div class="op-main">
                     <span class="op-code">{op.code}</span>
-                    <span class="op-separator">—</span>
+                    <span class="op-separator">-</span>
                     <span class="op-site">{op.site}</span>
                   </div>
                   <div class="op-details">

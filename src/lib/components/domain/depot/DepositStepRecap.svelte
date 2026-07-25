@@ -164,7 +164,7 @@
                             ? parseInt(structure.faces_count).toLocaleString(
                                   "fr-FR",
                               )
-                            : "—"}</span
+                            : "-"}</span
                     >
                 </div>
                 {#if structure.description}
@@ -207,7 +207,7 @@
                     class:recap-file-ok={filesCounts.model > 0}
                 >
                     <span class="recap-file-icon"
-                        >{filesCounts.model > 0 ? "✓" : "—"}</span
+                        >{filesCounts.model > 0 ? "✓" : "-"}</span
                     >
                     <span>Modèles 3D</span>
                     <span class="recap-file-count">{filesCounts.model}</span>
@@ -217,9 +217,9 @@
                     class:recap-file-ok={filesCounts.ortho > 0}
                 >
                     <span class="recap-file-icon"
-                        >{filesCounts.ortho > 0 ? "✓" : "—"}</span
+                        >{filesCounts.ortho > 0 ? "✓" : "-"}</span
                     >
-                    <span>Orthomosaïques</span>
+                    <span>Dérivés 2D</span>
                     <span class="recap-file-count">{filesCounts.ortho}</span>
                 </div>
                 <div
@@ -227,9 +227,9 @@
                     class:recap-file-ok={filesCounts.photo > 0}
                 >
                     <span class="recap-file-icon"
-                        >{filesCounts.photo > 0 ? "✓" : "—"}</span
+                        >{filesCounts.photo > 0 ? "✓" : "-"}</span
                     >
-                    <span>Photos</span>
+                    <span>Photos source</span>
                     <span class="recap-file-count">{filesCounts.photo}</span>
                 </div>
                 <div
@@ -237,7 +237,7 @@
                     class:recap-file-ok={filesCounts.work > 0}
                 >
                     <span class="recap-file-icon"
-                        >{filesCounts.work > 0 ? "✓" : "—"}</span
+                        >{filesCounts.work > 0 ? "✓" : "-"}</span
                     >
                     <span>Fichiers de travail</span>
                     <span class="recap-file-count">{filesCounts.work}</span>

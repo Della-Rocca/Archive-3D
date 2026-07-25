@@ -211,9 +211,9 @@
                   <div class="file-type">
                     <span class="ft-badge ft-ortho">Ortho</span>
                     <div>
-                      <strong>Orthophotographies</strong>
+                      <strong>Dérivés 2D</strong>
                       <span class="ft-exts">.tif, .tiff, .png, .jpg, .jpeg</span>
-                      <span class="ft-note">Orthomosaïques ou images de référence géoréférencées.</span>
+                      <span class="ft-note">Dérivés 2D ou images de référence géoréférencées.</span>
                     </div>
                   </div>
                   <div class="file-type">
@@ -302,7 +302,7 @@
             <div class="cards-grid cards-grid-3">
               <div class="info-card">
                 <h3>Structures</h3>
-                <p>Liste paginée de toutes les structures archivées avec indicateurs de contenu (modèle 3D, orthophotos, fichiers de production).</p>
+                <p>Liste paginée de toutes les structures archivées avec indicateurs de contenu (modèle 3D, dérivés 2D, données sources).</p>
               </div>
               <div class="info-card">
                 <h3>Statistiques</h3>

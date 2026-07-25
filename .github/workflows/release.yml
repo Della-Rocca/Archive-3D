@@ -5,7 +5,7 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
-
+  
 jobs:
   release:
     permissions:
@@ -67,8 +67,51 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: "Archive Metz v__VERSION__"
-          releaseBody: "See the assets to download this version and install."
-          releaseDraft: true
+          releaseName: "Archive 3D v__VERSION__"
+          releaseBody: "Nouvelle version de Archive 3D. Téléchargez le fichier correspondant à votre système ci-dessous, ou laissez l''application se mettre à jour automatiquement."
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
+  rename_assets:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Rename Release Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Download all assets
+          gh release download ${{ github.ref_name }} --dir release_assets
+          cd release_assets
+          
+          rename_and_upload() {
+            local pattern=$1
+            local new_name=$2
+            local file=$(ls $pattern 2>/dev/null | head -n 1)
+            if [ -n "$file" ]; then
+              echo "Renommage de $file en $new_name"
+              mv "$file" "$new_name"
+              # Delete the old file from release
+              gh release delete-asset ${{ github.ref_name }} "$file" -y || true
+              # Upload the new renamed file
+              gh release upload ${{ github.ref_name }} "$new_name"
+            fi
+          }
+          
+          # Windows
+          rename_and_upload "*x64-setup.exe" "1_Archive-3D_Windows_x64_Setup.exe"
+          rename_and_upload "*arm64-setup.exe" "2_Archive-3D_Windows_ARM64_Setup.exe"
+          rename_and_upload "*aarch64-setup.exe" "2_Archive-3D_Windows_ARM64_Setup.exe"
+          
+          # Mac
+          rename_and_upload "*universal.dmg" "3_Archive-3D_Mac_Universal.dmg"
+          rename_and_upload "*aarch64.dmg" "3_Archive-3D_Mac_AppleSilicon.dmg"
+          rename_and_upload "*x64.dmg" "3_Archive-3D_Mac_Intel.dmg"
+          
+          # Linux
+          rename_and_upload "*.AppImage" "4_Archive-3D_Linux_x64.AppImage"

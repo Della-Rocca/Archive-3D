@@ -7,7 +7,6 @@
 
   interface AppConfig {
     depot_path: string;
-    validation_path: string;
     archive_path: string;
     settings_path: string;
     admin_password?: string;
@@ -15,7 +14,6 @@
 
   let config: AppConfig = $state({
     depot_path: "",
-    validation_path: "",
     archive_path: "",
     settings_path: "",
   });
@@ -34,11 +32,7 @@
       title: "Dossier Dépôt",
       desc: "Ce dossier servira à réceptionner toutes les structures déposées, en attente de validation."
     },
-    {
-      field: "validation_path" as const,
-      title: "Dossier Validation",
-      desc: "Zone de travail temporaire où l'administrateur peut modifier, vérifier, générer les modèles 3D, etc."
-    },
+    // removed validation step
     {
       field: "archive_path" as const,
       title: "Dossier Archive",
@@ -56,7 +50,7 @@
   ];
 
   let currentField = $derived(
-    stepsInfo[step].field as "depot_path" | "validation_path" | "archive_path" | "settings_path" | undefined
+    stepsInfo[step].field as "depot_path" | "archive_path" | "settings_path" | undefined
   );
   let isCurrentFieldFilled = $derived(currentField ? !!config[currentField] : false);
 
@@ -75,7 +69,7 @@
     }
   });
 
-  async function pickPath(field: "depot_path" | "validation_path" | "archive_path" | "settings_path") {
+  async function pickPath(field: "depot_path" | "archive_path" | "settings_path") {
     const result = await open({
       directory: true,
       title: `Sélectionnez le dossier pour ${field}`

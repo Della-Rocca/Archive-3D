@@ -1,6 +1,6 @@
 {
   "productName": "Archive Metz",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "identifier": "fr.archive-metz",
   "build": {
     "beforeDevCommand": "npm run dev:web",

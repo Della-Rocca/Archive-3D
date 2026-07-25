@@ -118,7 +118,7 @@ struct StructureSummaryItem {
     path: String,
     has_model: bool,
     has_orthos: bool,
-    has_production: bool,
+    has_photos: bool,
     last_modified_unix: Option<u64>,
 }
 
@@ -150,7 +150,7 @@ struct StructureSummaryFilters {
     model_author: Option<String>,
     has_model: Option<bool>,
     has_orthos: Option<bool>,
-    has_production: Option<bool>,
+    has_photos: Option<bool>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -189,7 +189,6 @@ impl Default for StructureSummarySort {
 struct RouteStructureResult {
     validation_report: validation::ValidationReport,
     archived: bool,
-    validation_path: Option<String>,
     archive_path: Option<String>,
     override_used: bool,
 }
@@ -385,7 +384,6 @@ fn find_first_model_file(models_dir: &Path) -> Option<PathBuf> {
 fn allowed_roots_from_config(config: &AppConfig) -> Result<Vec<PathBuf>, String> {
     canonicalize_existing_roots(&[
         config.depot_path.clone(),
-        config.validation_path.clone(),
         config.archive_path.clone(),
     ])
 }
@@ -597,6 +595,25 @@ fn move_structure_between_spaces(
     }
     move_dir(&source_canonical, &destination)?;
 
+    // Nettoyage du dossier parent (Opération) s'il est vide ou ne contient que des fichiers ignorés (ex: .DS_Store)
+    if let Some(parent) = source_canonical.parent() {
+        if parent != source_root_canonical {
+            if let Ok(entries) = std::fs::read_dir(parent) {
+                let mut has_real_content = false;
+                for entry in entries.flatten() {
+                    let path = entry.path();
+                    if !is_ignored_sidecar_file(&path) {
+                        has_real_content = true;
+                        break;
+                    }
+                }
+                if !has_real_content {
+                    let _ = std::fs::remove_dir_all(parent);
+                }
+            }
+        }
+    }
+
     let result_path = destination
         .to_str()
         .map(|s| s.to_string())
@@ -650,7 +667,7 @@ fn write_revision_tags(
 /// --------------------
 ///
 /// - crée l'arborescence dans SpacesData/Depot
-/// - copie les fichiers dans Modeles / Orthomosaique / DossierProduction/{Photos,FichiersTravail}
+/// - copie les fichiers dans modeles / derivees_2D / donnees_sources/{Photos,FichiersTravail}
 /// - écrit un metadata.json pour la structure
 /// - met à jour le fichier d'ontologies locales (operations, types, logiciels, sites, responsables, auteurs)
 ///
@@ -685,9 +702,9 @@ fn deposit_structure(
     let op_dir = base_depot.join(op_folder_name);
     let st_dir = op_dir.join(st_folder_name);
 
-    let models_dir = st_dir.join("Modeles");
-    let orthos_dir = st_dir.join("Orthomosaique");
-    let prod_dir = st_dir.join("DossierProduction");
+    let models_dir = st_dir.join("modeles");
+    let orthos_dir = st_dir.join("derivees_2D");
+    let prod_dir = st_dir.join("donnees_sources");
     let photos_dir = prod_dir.join("Photos");
     let travail_dir = prod_dir.join("FichiersTravail");
 
@@ -776,24 +793,7 @@ fn count_model_polygons(path: String) -> Result<u64, String> {
     Ok(polygons)
 }
 
-#[tauri::command]
-fn validate_structure_from_depot(
-    config_state: State<AppConfigState>,
-    structure_path_in_depot: String,
-) -> Result<String, String> {
-    let config = config_state
-        .lock()
-        .map_err(|e| format!("Erreur accès config: {}", e))?;
-
-    move_structure_between_spaces(
-        &config,
-        &structure_path_in_depot,
-        &config.depot_path,
-        &config.validation_path,
-        AuditAction::Validate,
-        None,
-    )
-}
+// removed validate_structure_from_depot
 
 #[tauri::command]
 fn get_revision_tags(
@@ -844,24 +844,7 @@ fn set_revision_tag(
 ///   COMMANDE ARCHIVE
 ///   Validation -> Archive
 /// ------------------------
-#[tauri::command]
-fn archive_structure_from_validation(
-    config_state: State<AppConfigState>,
-    structure_path_in_validation: String,
-) -> Result<String, String> {
-    let config = config_state
-        .lock()
-        .map_err(|e| format!("Erreur accès config: {}", e))?;
-
-    move_structure_between_spaces(
-        &config,
-        &structure_path_in_validation,
-        &config.validation_path,
-        &config.archive_path,
-        AuditAction::Archive,
-        None,
-    )
-}
+// removed archive_structure_from_validation
 
 /// ------------------------
 ///   COMMANDE ARCHIVE DIRECTE
@@ -907,22 +890,10 @@ fn validate_then_route_structure(
         return Ok(RouteStructureResult {
             validation_report,
             archived: false,
-            validation_path: None,
             archive_path: None,
             override_used: false,
         });
     }
-
-    let validation_path = move_structure_between_spaces(
-        &config,
-        structure_path
-            .to_str()
-            .ok_or_else(|| "Chemin structure invalide".to_string())?,
-        &config.depot_path,
-        &config.validation_path,
-        AuditAction::Validate,
-        None,
-    )?;
 
     let mut archive_metadata = None;
     if allow_override {
@@ -941,8 +912,10 @@ fn validate_then_route_structure(
 
     let archive_path = move_structure_between_spaces(
         &config,
-        &validation_path,
-        &config.validation_path,
+        structure_path
+            .to_str()
+            .ok_or_else(|| "Chemin structure invalide".to_string())?,
+        &config.depot_path,
         &config.archive_path,
         action,
         archive_metadata,
@@ -951,7 +924,6 @@ fn validate_then_route_structure(
     Ok(RouteStructureResult {
         validation_report,
         archived: true,
-        validation_path: Some(validation_path),
         archive_path: Some(archive_path),
         override_used: should_use_override_action,
     })
@@ -967,7 +939,6 @@ fn list_structures_for_space(
 ) -> Result<Vec<StructureListItem>, String> {
     let base_raw = match space {
         "Depot" => PathBuf::from(&config.depot_path),
-        "Validation" => PathBuf::from(&config.validation_path),
         "Archive" => PathBuf::from(&config.archive_path),
         _ => return Err(format!("Espace inconnu: {}", space)),
     };
@@ -1084,14 +1055,9 @@ fn to_summary_item(
             .map(|m| m.structure.model_author.clone())
             .unwrap_or_default(),
         path,
-        has_model: has_any_file(&structure_path.join("Modeles")),
-        has_orthos: has_any_file(&structure_path.join("Orthomosaique")),
-        has_production: has_any_file(&structure_path.join("DossierProduction").join("Photos"))
-            || has_any_file(
-                &structure_path
-                    .join("DossierProduction")
-                    .join("FichiersTravail"),
-            ),
+        has_model: has_any_file(&structure_path.join("modeles")),
+        has_orthos: has_any_file(&structure_path.join("derivees_2D")),
+        has_photos: has_any_file(&structure_path.join("donnees_sources").join("Photos")),
         last_modified_unix: get_modified_unix_seconds(structure_path),
     })
 }
@@ -1115,8 +1081,8 @@ fn match_filters(item: &StructureSummaryItem, filters: &StructureSummaryFilters)
         }
     }
 
-    if let Some(has_production) = filters.has_production {
-        if item.has_production != has_production {
+    if let Some(has_photos) = filters.has_photos {
+        if item.has_photos != has_photos {
             return false;
         }
     }
@@ -1266,9 +1232,9 @@ fn get_structure_details(
         (None, None)
     };
 
-    let models = list_files_in_dir(&st_dir.join("Modeles"))?;
-    let orthos = list_files_in_dir(&st_dir.join("Orthomosaique"))?;
-    let prod_dir = st_dir.join("DossierProduction");
+    let models = list_files_in_dir(&st_dir.join("modeles"))?;
+    let orthos = list_files_in_dir(&st_dir.join("derivees_2D"))?;
+    let prod_dir = st_dir.join("donnees_sources");
     let photos = list_files_in_dir(&prod_dir.join("Photos"))?;
     let work_files = list_files_in_dir(&prod_dir.join("FichiersTravail"))?;
 
@@ -1331,7 +1297,6 @@ fn get_image_preview_data_url(
 
     let allowed_roots = canonicalize_existing_roots(&[
         config.depot_path.clone(),
-        config.validation_path.clone(),
         config.archive_path.clone(),
     ])?;
     if allowed_roots.is_empty() {
@@ -1460,15 +1425,15 @@ fn generate_inventory(config_state: State<AppConfigState>) -> Result<Vec<Invento
             };
 
             // Obtenir la taille du modèle 3D
-            let models_dir = st_path.join("Modeles");
+            let models_dir = st_path.join("modeles");
             let model_size_mb = if let Some(model_file) = find_first_model_file(&models_dir) {
                 format!("{:.2}", get_file_size_mb(&model_file))
             } else {
                 "0".to_string()
             };
             let photos_total_size_mb = {
-                let orthos_dir = st_path.join("Orthomosaique");
-                let prod_photos_dir = st_path.join("DossierProduction").join("Photos");
+                let orthos_dir = st_path.join("derivees_2D");
+                let prod_photos_dir = st_path.join("donnees_sources").join("Photos");
                 let total_bytes =
                     get_directory_size_bytes(&orthos_dir) + get_directory_size_bytes(&prod_photos_dir);
                 format!("{:.2}", total_bytes as f64 / (1024.0 * 1024.0))
@@ -1558,8 +1523,8 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             deposit_structure,
-            validate_structure_from_depot,
-            archive_structure_from_validation,
+            // Removed validate_structure_from_depot
+            // Removed archive_structure_from_validation
             archive_structure_from_depot,
             get_revision_tags,
             set_revision_tag,

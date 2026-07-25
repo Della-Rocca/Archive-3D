@@ -94,31 +94,31 @@ pub fn validate_structure(structure_path: &Path) -> Result<ValidationReport, Str
     validate_metadata_fields(&metadata, &mut report);
 
     // 4. Vérifier la présence des dossiers
-    let models_dir = structure_path.join("Modeles");
-    let orthos_dir = structure_path.join("Orthomosaique");
-    let prod_dir = structure_path.join("DossierProduction");
+    let models_dir = structure_path.join("modeles");
+    let orthos_dir = structure_path.join("derivees_2D");
+    let prod_dir = structure_path.join("donnees_sources");
     let photos_dir = prod_dir.join("Photos");
     let travail_dir = prod_dir.join("FichiersTravail");
 
     if !models_dir.exists() {
-        report.add_warning("files", "Dossier 'Modeles' manquant".to_string());
+        report.add_warning("files", "Dossier 'modeles' manquant".to_string());
     }
     if !orthos_dir.exists() {
-        report.add_warning("files", "Dossier 'Orthomosaique' manquant".to_string());
+        report.add_warning("files", "Dossier 'derivees_2D' manquant".to_string());
     }
     if !prod_dir.exists() {
-        report.add_warning("files", "Dossier 'DossierProduction' manquant".to_string());
+        report.add_warning("files", "Dossier 'donnees_sources' manquant".to_string());
     } else {
         if !photos_dir.exists() {
             report.add_warning(
                 "files",
-                "Sous-dossier 'DossierProduction/Photos' manquant".to_string(),
+                "Sous-dossier 'donnees_sources/Photos' manquant".to_string(),
             );
         }
         if !travail_dir.exists() {
             report.add_warning(
                 "files",
-                "Sous-dossier 'DossierProduction/FichiersTravail' manquant".to_string(),
+                "Sous-dossier 'donnees_sources/FichiersTravail' manquant".to_string(),
             );
         }
     }
@@ -130,14 +130,14 @@ pub fn validate_structure(structure_path: &Path) -> Result<ValidationReport, Str
                 if count == 0 {
                     report.add_error(
                         "files",
-                        "Aucun fichier dans le dossier 'Modeles'".to_string(),
+                        "Aucun fichier dans le dossier 'modeles'".to_string(),
                     );
                 }
             }
             Err(e) => {
                 report.add_warning(
                     "files",
-                    format!("Impossible de lire le dossier Modeles: {}", e),
+                    format!("Impossible de lire le dossier modeles: {}", e),
                 );
             }
         }
@@ -149,7 +149,7 @@ pub fn validate_structure(structure_path: &Path) -> Result<ValidationReport, Str
             if count == 0 {
                 report.add_warning(
                     "files",
-                    "Aucun fichier dans le dossier 'Orthomosaique'".to_string(),
+                    "Aucun fichier dans le dossier 'derivees_2D'".to_string(),
                 );
             }
         }
@@ -160,7 +160,7 @@ pub fn validate_structure(structure_path: &Path) -> Result<ValidationReport, Str
             if count == 0 {
                 report.add_warning(
                     "files",
-                    "Aucun fichier dans 'DossierProduction/Photos'".to_string(),
+                    "Aucun fichier dans 'donnees_sources/Photos'".to_string(),
                 );
             }
         }
@@ -171,7 +171,7 @@ pub fn validate_structure(structure_path: &Path) -> Result<ValidationReport, Str
             if count == 0 {
                 report.add_warning(
                     "files",
-                    "Aucun fichier dans 'DossierProduction/FichiersTravail'".to_string(),
+                    "Aucun fichier dans 'donnees_sources/FichiersTravail'".to_string(),
                 );
             }
         }
@@ -243,7 +243,6 @@ pub fn update_structure_metadata(
 
     let allowed_roots = crate::fs_safety::canonicalize_existing_roots(&[
         config.depot_path.clone(),
-        config.validation_path.clone(),
         config.archive_path.clone(),
     ])?;
     if allowed_roots.is_empty() {

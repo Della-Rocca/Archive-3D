@@ -68,7 +68,7 @@
         class="combo-input"
         {placeholder}
         {disabled}
-        on:input={handleInput}
+        readonly
         on:click={handleClick}
         on:blur={handleBlur}
         on:keydown={handleKeydown}

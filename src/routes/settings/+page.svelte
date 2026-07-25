@@ -5,7 +5,6 @@
 
   interface AppConfig {
     depot_path: string;
-    validation_path: string;
     archive_path: string;
     settings_path: string;
     admin_password: string;
@@ -19,13 +18,12 @@
 
   let config: AppConfig = $state({
     depot_path: "",
-    validation_path: "",
     archive_path: "",
     settings_path: "",
     admin_password: "",
   });
 
-  type PathField = "depot_path" | "validation_path" | "archive_path" | "settings_path";
+  type PathField = "depot_path" | "archive_path" | "settings_path";
   type PathFieldMeta = {
     field: PathField;
     label: string;
@@ -38,11 +36,7 @@
       label: "Dossier Dépôt",
       hint: "Source des structures déposées avant validation.",
     },
-    {
-      field: "validation_path",
-      label: "Dossier Validation",
-      hint: "Zone de contrôle qualité avant archivage.",
-    },
+    // removed validation_path
     {
       field: "archive_path",
       label: "Dossier Archive",
@@ -66,14 +60,13 @@
   type FieldIssues = Record<PathField, { errors: string[]; warnings: string[] }>;
   const emptyFieldIssues = (): FieldIssues => ({
     depot_path: { errors: [], warnings: [] },
-    validation_path: { errors: [], warnings: [] },
     archive_path: { errors: [], warnings: [] },
     settings_path: { errors: [], warnings: [] },
   });
 
   const fieldMessageMatchers: Record<PathField, string[]> = {
     depot_path: ["dépôt", "depot"],
-    validation_path: ["validation"],
+    // removed validation_path matcher
     archive_path: ["archive"],
     settings_path: ["paramètres", "parametres", "settings"],
   };

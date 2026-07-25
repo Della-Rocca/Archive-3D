@@ -90,7 +90,8 @@
             <textarea
                 class="meta-input"
                 bind:value={structure.description}
-                placeholder="Description libre (optionnel)"
+                on:blur={() => handleTouch("structure.description")}
+                placeholder="Description libre"
                 rows="2"
             ></textarea>
         </div>
@@ -102,26 +103,37 @@
             <h3 class="field-group-title">Modèle 3D</h3>
             <div class="field-row-2">
                 <div class="field-col">
-                    <label class="meta-label">Auteur du modèle</label>
-                    <ComboInput
-                        bind:value={structure.model_author}
-                        options={presets.model_authors}
-                        placeholder="ex: Martin Pierre"
-                    />
+                    <label class="meta-label">Auteur du modèle *</label>
+                    <div class:combo-error={!!errors["structure.model_author"]}>
+                        <ComboInput
+                            bind:value={structure.model_author}
+                            options={presets.model_authors}
+                            placeholder="ex: Martin Pierre"
+                            on:change={() => handleTouch("structure.model_author")}
+                        />
+                    </div>
+                    {#if errors["structure.model_author"]}
+                        <span class="field-error">{errors["structure.model_author"]}</span>
+                    {/if}
                 </div>
                 <div class="field-col">
-                    <label class="meta-label">Déposant</label>
-                    <ComboInput
-                        bind:value={structure.depositor}
-                        options={presets.depositors}
-                        placeholder="ex: Votre nom"
-                    />
+                    <label class="meta-label">Déposant *</label>
+                    <div class:combo-error={!!errors["structure.depositor"]}>
+                        <ComboInput
+                            bind:value={structure.depositor}
+                            options={presets.depositors}
+                            placeholder="ex: Votre nom"
+                            on:change={() => handleTouch("structure.depositor")}
+                        />
+                    </div>
+                    {#if errors["structure.depositor"]}
+                        <span class="field-error">{errors["structure.depositor"]}</span>
+                    {/if}
                 </div>
             </div>
 
-            <!-- Logiciels -->
-            <div class="software-field">
-                <label class="meta-label">Logiciels utilisés</label>
+            <div class="software-field" class:combo-error={!!errors["structure.software"]}>
+                <label class="meta-label">Logiciels utilisés *</label>
                 {#if presets.software_types.length > 0}
                     <div class="checkbox-group">
                         {#each presets.software_types as sw}
@@ -138,11 +150,14 @@
                 {:else}
                     <p class="hint-text">Aucun logiciel configuré.</p>
                 {/if}
+                {#if errors["structure.software"]}
+                    <span class="field-error">{errors["structure.software"]}</span>
+                {/if}
             </div>
 
             <div class="field-row-2">
                 <div class="field-col">
-                    <label class="meta-label">Nombre de photos</label>
+                    <label class="meta-label">Nombre de photos source</label>
                     <input
                         class="meta-input"
                         value={structure.photos_count}
@@ -175,13 +190,15 @@
         background: #fff;
         border: 1px solid var(--color-neutral-300);
         border-radius: var(--border-radius-lg);
-        overflow: hidden;
+        overflow: visible;
         margin-bottom: var(--spacing-xl);
     }
     .section-header {
         background: var(--color-neutral-100);
         padding: var(--spacing-md) var(--spacing-lg);
         border-bottom: 1px solid var(--color-neutral-300);
+        border-top-left-radius: var(--border-radius-lg);
+        border-top-right-radius: var(--border-radius-lg);
     }
     .section-header h2 {
         margin: 0;

@@ -17,11 +17,11 @@ Permet de parcourir, visualiser et inventorier les structures archéologiques nu
 
 ## Installation
 
-Télécharge le fichier correspondant à ton système depuis la [dernière release GitHub](../../releases/latest) :
+Télécharge le fichier correspondant à ton système depuis la [dernière release GitHub](https://github.com/Della-Rocca/Archive3D-Metz/releases/latest) :
 
-- macOS : fichier `.dmg`
-- Windows : fichier `-setup.exe` (installateur NSIS)
-- Linux : fichier `.AppImage`
+- **Windows** : [📥 Télécharger pour Windows (x64)](https://github.com/Della-Rocca/Archive3D-Metz/releases/latest/download/1_Archive-3D_Windows_x64_Setup.exe) (ou [Windows ARM64](https://github.com/Della-Rocca/Archive3D-Metz/releases/latest/download/2_Archive-3D_Windows_ARM64_Setup.exe))
+- **macOS** : [📥 Télécharger pour Mac (Universal)](https://github.com/Della-Rocca/Archive3D-Metz/releases/latest/download/3_Archive-3D_Mac_Universal.dmg)
+- **Linux** : [📥 Télécharger pour Linux (AppImage)](https://github.com/Della-Rocca/Archive3D-Metz/releases/latest/download/4_Archive-3D_Linux_x64.AppImage)
 
 Une fois installée, l'application vérifie automatiquement à chaque démarrage s'il existe une nouvelle version et propose de l'installer en un clic (aucun re-téléchargement manuel nécessaire).
 
