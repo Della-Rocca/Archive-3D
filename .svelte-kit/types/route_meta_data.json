@@ -1,0 +1,27 @@
+{
+	"/": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/archive": [
+		"src/routes/+layout.ts"
+	],
+	"/depot": [
+		"src/routes/+layout.ts"
+	],
+	"/login": [
+		"src/routes/+layout.ts"
+	],
+	"/settings": [
+		"src/routes/+layout.ts"
+	],
+	"/setup": [
+		"src/routes/+layout.ts"
+	],
+	"/tutorial": [
+		"src/routes/+layout.ts"
+	],
+	"/validation": [
+		"src/routes/+layout.ts"
+	]
+}
