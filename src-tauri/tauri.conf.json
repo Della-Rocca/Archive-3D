@@ -52,7 +52,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDU5MjhDQjA2NzAwRjdCNTQKUldSVWV3OXdCc3NvV1hVdXQyRVhzSW1KRkY1NnZrNWUwTUhWSmFPOTVoNnFWL2s2RkJBaHNra2sK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDMyQjU2QjAwNzUzRkY3MjgKUldRbzl6OTFBR3UxTW5NVGZCN29IQ2Q4cEVRdkFSYXI3b3UxY3NwNSt0LzZrOVY2ZkZ5VVBqcS8K",
       "endpoints": [
         "https://github.com/Della-Rocca/Archive3D-Metz/releases/latest/download/latest.json"
       ],
