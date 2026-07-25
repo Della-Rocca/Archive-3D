@@ -66,7 +66,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: ${{ github.ref_name }}
+          tagName: v__VERSION__
           releaseName: "Archive 3D v__VERSION__"
           releaseBody: "Nouvelle version de Archive 3D. Téléchargez le fichier correspondant à votre système ci-dessous, ou laissez l''application se mettre à jour automatiquement."
           releaseDraft: false
@@ -85,8 +85,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v$VERSION"
+          
           # Download all assets
-          gh release download ${{ github.ref_name }} --dir release_assets
+          gh release download $TAG --dir release_assets
           cd release_assets
           
           rename_and_upload() {
@@ -97,9 +100,9 @@ jobs:
               echo "Renommage de $file en $new_name"
               mv "$file" "$new_name"
               # Delete the old file from release
-              gh release delete-asset ${{ github.ref_name }} "$file" -y || true
+              gh release delete-asset $TAG "$file" -y || true
               # Upload the new renamed file
-              gh release upload ${{ github.ref_name }} "$new_name"
+              gh release upload $TAG "$new_name"
             fi
           }
           
