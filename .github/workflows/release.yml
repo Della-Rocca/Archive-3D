@@ -67,7 +67,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "Archive 3D v__VERSION__"
-          releaseBody: "See the assets to download this version and install."
+          releaseBody: "Nouvelle version de Archive 3D. Téléchargez le fichier correspondant à votre système ci-dessous, ou laissez l''application se mettre à jour automatiquement."
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
