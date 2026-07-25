@@ -1,0 +1,1 @@
+import"../chunks/Bzak7iHL.js";import{p as a,u as e,a as p}from"../chunks/CrlPJJhq.js";import{g as o}from"../chunks/2P9pfjyc.js";import{a as r}from"../chunks/Bf0n_JH1.js";function u(s,t){a(t,!0),e(()=>{r.isAuthenticated?o("/depot"):o("/login")}),p()}export{u as component};
