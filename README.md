@@ -17,7 +17,7 @@ Permet de parcourir, visualiser et inventorier les structures archéologiques nu
 
 ## Installation
 
-Télécharge le fichier correspondant à ton système depuis la [dernière release GitHub](https://github.com/Della-Rocca/Archive3D-Metz/releases/latest) :
+Télécharge le fichier correspondant à ton système depuis la [dernière release GitHub](https://github.com/Della-Rocca/Archive-3D/releases) :
 
 Une fois installée, l'application vérifie automatiquement à chaque démarrage s'il existe une nouvelle version et propose de l'installer en un clic (aucun re-téléchargement manuel nécessaire).
 
